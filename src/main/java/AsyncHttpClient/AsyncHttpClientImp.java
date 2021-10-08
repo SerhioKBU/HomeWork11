@@ -18,7 +18,7 @@ public class AsyncHttpClientImp implements AsyncHttpClient {
     public static final String ANSI_RESET = "\u001B[0m";
     private final HttpClient client;
     private final ObjectMapper objectMapper;
-    String responseBody = "";
+    Response responseBody = new Response();
 
     @Override
     public void get(String address, Map<String, String> headers) {
@@ -37,10 +37,10 @@ public class AsyncHttpClientImp implements AsyncHttpClient {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                responseBody = response.body();
+                responseBody.setResponse(response.body());
                 System.out.println("-------------GET REQUEST-----------------\n" +
                         ANSI_GREEN + "Status Code: " + response.statusCode() + ANSI_RESET);
-                System.out.println(responseBody);
+                System.out.println(responseBody.toString());
             } else {
                 System.out.println(ANSI_RED + "GET request doesn't work" + ANSI_RESET);
             }
@@ -56,7 +56,7 @@ public class AsyncHttpClientImp implements AsyncHttpClient {
 
         Thread thread = new Thread(()-> {
         try {
-            HttpRequest request = null;
+            HttpRequest request;
             //for (Map.Entry<String, String> header : headers.entrySet()) {
                 String requestBody = objectMapper.writeValueAsString(payload);
                 request = HttpRequest.newBuilder()
@@ -72,7 +72,7 @@ public class AsyncHttpClientImp implements AsyncHttpClient {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                responseBody = response.body();
+                responseBody.setResponse(response.body());
                 System.out.println("-------------POST REQUEST-----------------\n" +
                         ANSI_GREEN + "ResponseCode: " + response.statusCode() + ANSI_RESET);
                 System.out.println(responseBody);
@@ -92,7 +92,7 @@ public class AsyncHttpClientImp implements AsyncHttpClient {
     public void put(String address, Map<String, String> headers, String payload) {
         Thread thread = new Thread(()-> {
             try {
-                HttpRequest request = null;
+                HttpRequest request;
                 String requestBody = objectMapper.writeValueAsString(payload);
                 request = HttpRequest.newBuilder()
                         .PUT(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -106,7 +106,7 @@ public class AsyncHttpClientImp implements AsyncHttpClient {
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
                 if (response.statusCode() == 200) {
-                    responseBody = response.body();
+                    responseBody.setResponse(response.body());
                     System.out.println("-------------PUT REQUEST-----------------\n" +
                             ANSI_GREEN + "Status Code: " + response.statusCode() + ANSI_RESET);
                     System.out.println(responseBody);
@@ -125,7 +125,7 @@ public class AsyncHttpClientImp implements AsyncHttpClient {
     public void delete(String address, Map<String, String> headers, String payload) {
         Thread thread = new Thread(()-> {
             try {
-                HttpRequest request = null;
+                HttpRequest request;
                 request = HttpRequest.newBuilder()
                         .DELETE()
                         .uri(URI.create(address))
@@ -138,7 +138,7 @@ public class AsyncHttpClientImp implements AsyncHttpClient {
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
                 if (response.statusCode() == 200) {
-                    responseBody = response.body();
+                    responseBody.setResponse(response.body());
                     System.out.println("-------------DELETE REQUEST-----------------\n" +
                             ANSI_GREEN + "Status Code: " + response.statusCode() + ANSI_RESET);
                     System.out.println(responseBody);
